@@ -2,7 +2,7 @@
 
 Serves a repaired copy of the USJETAA events RSS feed at:
 
-**https://porkbutts.github.io/usjetaa-feed-mirror/usjetaa.xml**
+**https://adriant.io/usjetaa-feed-mirror/usjetaa.xml**
 
 MonitoRSS points at this instead of Wild Apricot directly, so USJETAA
 announcements in the JETAASC Discord render with their event graphic.
