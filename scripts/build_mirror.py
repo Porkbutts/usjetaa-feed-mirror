@@ -49,6 +49,15 @@ EMPTY_EL = re.compile(
 )
 BLANK_RUN = re.compile(r"\n\s*\n+")
 
+# Wild Apricot puts line breaks inside emphasis, e.g. <em>featuring<br></em>.
+# That converts to "*featuring\n*", and Discord will not pair a marker that
+# sits on its own line, so the asterisks render literally. Moving the break
+# outside the tag restores "*featuring*".
+EMPHASIS_EDGE = re.compile(
+    r"<(strong|em|b|i|u)\b([^>]*)>((?:\s|<br\s*/?>)*)(.*?)((?:\s|<br\s*/?>)*)</\1>",
+    re.I | re.S,
+)
+
 MIMES = {
     "png": "image/png",
     "jpg": "image/jpeg",
@@ -107,7 +116,7 @@ def mime_for(url: str) -> str:
 
 
 def strip_images(markup: str) -> str:
-    """Drop every <img> and any wrapper it leaves empty.
+    """Drop every <img>, any wrapper it leaves empty, and fix stray emphasis.
 
     Removing the tag alone leaves <p><span><font></font></span></p>, which
     renders as a blank line in a Discord embed, and an emptied <strong> shows
@@ -115,7 +124,8 @@ def strip_images(markup: str) -> str:
     """
     markup = IMG_TAG.sub("", markup)
     while True:
-        collapsed = EMPTY_EL.sub("", markup)
+        collapsed = EMPHASIS_EDGE.sub(r"\3<\1\2>\4</\1>\5", markup)
+        collapsed = EMPTY_EL.sub("", collapsed)
         if collapsed == markup:
             break
         markup = collapsed
