@@ -1,0 +1,34 @@
+name: Mirror USJETAA feed
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mirror
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rebuild mirror
+        run: python3 scripts/build_mirror.py docs/usjetaa.xml
+
+      - name: Commit if changed
+        run: |
+          if [ -z "$(git status --porcelain docs/usjetaa.xml)" ]; then
+            echo "Feed unchanged, nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/usjetaa.xml
+          git commit -m "Update USJETAA feed mirror"
+          git push
