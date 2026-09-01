@@ -24,18 +24,36 @@ same result on the free tier.
 `scripts/build_mirror.py` fetches the upstream feed and:
 
 1. rewrites `/widget/resources/` to `/resources/` so images resolve
-2. removes images from the description along with the wrapper elements left
-   empty behind them. Wild Apricot nests images several deep
-   (`<p><span><font><img></font></span></p>`); deleting only the `<img>` leaves
-   an empty paragraph that renders as a blank line, and an emptied `<strong>`
-   shows up as a stray `**`. The blank lines that surrounded the removed
-   elements are collapsed too
-3. adds an `<enclosure>` holding the first image that actually resolves, so
+2. adds an `<enclosure>` holding the first image that actually resolves, so
    consumers get a clean image field rather than having to dig one out of
    description HTML
+3. normalizes the description HTML so it survives conversion to markdown
 
 It refuses to write output if the upstream returned no items or if any broken
 path survived, so a bad fetch leaves the last good mirror in place.
+
+### Why the description is parsed, not pattern-matched
+
+Wild Apricot's editor emits deeply nested cruft: images four wrappers deep
+(`<p><span><font><img></font></span></p>`), line breaks inside emphasis
+(`<em>featuring<br></em>`, which becomes `*featuring\n*` and renders as
+literal asterisks because Discord will not pair a marker alone on a line), and
+`<strong>` around nothing but an empty anchor.
+
+Matching each shape with its own regex meant a new rule for every new shape,
+and it still missed cases. Parsing to a tree allows the recursive question a
+regex cannot ask -- *does anything under this node render as visible text?* --
+so three invariants cover the whole class:
+
+1. no images in the description; the chosen one is in the `<enclosure>`
+2. emphasis never wraps its own edges, so breaks are hoisted outside the tag
+3. any element with no visible text beneath it is dropped, recursively, except
+   those meaningful while empty (`br`, `hr`, table cells)
+
+Measured over the 14 live articles, against the previous regex approach:
+orphaned emphasis markers 4 to **0**, blank-line runs 79 to **67**, and **no
+words lost** (verified by diffing the word sequence of every article against
+upstream).
 
 ## Notes
 
@@ -60,4 +78,5 @@ path survived, so a bad fetch leaves the last good mirror in place.
 python3 scripts/build_mirror.py docs/usjetaa.xml
 ```
 
-No dependencies beyond the Python standard library.
+No dependencies beyond the Python standard library, including the HTML
+parsing, so there is no install step in CI.
