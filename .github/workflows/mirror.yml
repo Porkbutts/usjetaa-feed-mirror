@@ -2,7 +2,7 @@ name: Mirror USJETAA feed
 
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "41 * * * *"
   workflow_dispatch:
 
 permissions:
