@@ -24,8 +24,12 @@ same result on the free tier.
 `scripts/build_mirror.py` fetches the upstream feed and:
 
 1. rewrites `/widget/resources/` to `/resources/` so images resolve
-2. strips the base64 spacer GIFs Wild Apricot injects, which otherwise render
-   as literal `data:image/gif;base64,...` text in a Discord embed
+2. removes images from the description along with the wrapper elements left
+   empty behind them. Wild Apricot nests images several deep
+   (`<p><span><font><img></font></span></p>`); deleting only the `<img>` leaves
+   an empty paragraph that renders as a blank line, and an emptied `<strong>`
+   shows up as a stray `**`. The blank lines that surrounded the removed
+   elements are collapsed too
 3. adds an `<enclosure>` holding the first image that actually resolves, so
    consumers get a clean image field rather than having to dig one out of
    description HTML

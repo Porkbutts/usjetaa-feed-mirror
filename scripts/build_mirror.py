@@ -8,7 +8,8 @@ way to rewrite a placeholder.
 
 This rebuilds the feed with:
   - image paths corrected (/widget/resources/ -> /resources/)
-  - the base64 spacer GIFs Wild Apricot injects stripped out
+  - images removed from the description, along with the wrapper elements
+    left empty behind them
   - an <enclosure> carrying the first image that actually resolves, so
     consumers get a clean image field instead of having to dig one out of
     description HTML
@@ -37,8 +38,16 @@ FIXED_PREFIX = "wildapricot.org/resources/"
 
 ITEM = re.compile(r"<item>.*?</item>", re.S)
 DESCRIPTION = re.compile(r"(<description>)(.*?)(</description>)", re.S)
-DATA_IMG = re.compile(r"<img[^>]+src=\"data:[^\"]*\"[^>]*>", re.I)
+IMG_TAG = re.compile(r"<img\b[^>]*>", re.I)
 IMG_SRC = re.compile(r"<img[^>]+src=\"([^\"]+)\"", re.I)
+
+# A wrapper holding only whitespace once its image is gone. Wild Apricot nests
+# these several deep (<p><span><font><img></font></span></p>), so this is
+# applied repeatedly until the text stops changing.
+EMPTY_EL = re.compile(
+    r"<(p|div|span|font|strong|em|b|i|u)\b[^>]*>(?:\s|&nbsp;|\u00a0)*</\1>", re.I
+)
+BLANK_RUN = re.compile(r"\n\s*\n+")
 
 MIMES = {
     "png": "image/png",
@@ -97,14 +106,35 @@ def mime_for(url: str) -> str:
     return MIMES.get(ext, "image/png")
 
 
+def strip_images(markup: str) -> str:
+    """Drop every <img> and any wrapper it leaves empty.
+
+    Removing the tag alone leaves <p><span><font></font></span></p>, which
+    renders as a blank line in a Discord embed, and an emptied <strong> shows
+    up as a stray "**".
+    """
+    markup = IMG_TAG.sub("", markup)
+    while True:
+        collapsed = EMPTY_EL.sub("", markup)
+        if collapsed == markup:
+            break
+        markup = collapsed
+
+    # Removing an element leaves the blank lines that surrounded it. They are
+    # insignificant in HTML but survive the conversion to markdown as real
+    # blank lines, so collapse runs down to one; the block tags still supply
+    # the paragraph breaks.
+    return BLANK_RUN.sub("\n", markup).strip()
+
+
 def rewrite_item(item: str) -> str:
     match = DESCRIPTION.search(item)
     if not match:
         return item
 
     description = html.unescape(match.group(2))
-    description = DATA_IMG.sub("", description)
     images = [u for u in IMG_SRC.findall(description) if not u.startswith("data:")]
+    description = strip_images(description)
 
     rebuilt = (
         item[: match.start(2)]
