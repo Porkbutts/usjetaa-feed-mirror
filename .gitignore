@@ -1,2 +1,8 @@
 __pycache__/
 *.pyc
+
+# Scratch copies pulled down while verifying the served feed
+live.xml
+served.xml
+committed.xml
+*.tmp.xml
