@@ -138,6 +138,18 @@ def is_blank(node: Node) -> bool:
     return not node.visible_text().strip()
 
 
+def is_trimmable_edge(node: Node) -> bool:
+    """True for content that must not sit inside an emphasis tag's edge.
+
+    Distinct from is_blank(): a <br> is meaningful and must be kept, but it
+    cannot stay *inside* <em>...</em> or the markdown marker lands on its own
+    line and Discord renders it literally.
+    """
+    if node.is_text:
+        return not node.text.replace("\xa0", " ").strip()
+    return node.tag in {"br", "hr"}
+
+
 def normalize(node: Node) -> None:
     """Apply three invariants bottom-up.
 
@@ -160,10 +172,10 @@ def normalize(node: Node) -> None:
         normalize(child)
 
         if child.tag in EMPHASIS:
-            while child.children and is_blank(child.children[0]):
+            while child.children and is_trimmable_edge(child.children[0]):
                 kept.append(child.children.pop(0))
             trailing = []
-            while child.children and is_blank(child.children[-1]):
+            while child.children and is_trimmable_edge(child.children[-1]):
                 trailing.insert(0, child.children.pop())
             if not is_blank(child):
                 kept.append(child)
