@@ -26,8 +26,9 @@ same result on the free tier.
 1. rewrites `/widget/resources/` to `/resources/` so images resolve
 2. strips the base64 spacer GIFs Wild Apricot injects, which otherwise render
    as literal `data:image/gif;base64,...` text in a Discord embed
-3. adds an `<enclosure>` holding the first real image, so consumers get a clean
-   image field rather than having to dig one out of description HTML
+3. adds an `<enclosure>` holding the first image that actually resolves, so
+   consumers get a clean image field rather than having to dig one out of
+   description HTML
 
 It refuses to write output if the upstream returned no items or if any broken
 path survived, so a bad fetch leaves the last good mirror in place.
@@ -40,9 +41,14 @@ path survived, so a bad fetch leaves the last good mirror in place.
   the fetch would start failing.
 - **A browser User-Agent is required.** Wild Apricot 403s default agents with
   "Your User Agent has been flagged for unauthorized access."
-- One upstream image, `JETAAFL Career Workshop.png`, 404s at both the broken
-  and the corrected path. That file is missing on USJETAA's side; nothing here
-  can fix it, and that article will simply have no thumbnail.
+- **Articles sometimes lead with a broken image.** The PNWJETAA Transitions
+  event opens with `JETAAFL Career Workshop.png`, which 404s at every path, and
+  carries the real graphic (`2026 PNWJETAA- FINAL BLOG.png`) second. So the
+  build HEAD-checks candidates and takes the first that serves an `image/*`
+  content type rather than trusting document order.
+- If a check cannot complete (Wild Apricot unreachable mid-build) the candidate
+  is treated as usable rather than discarded, so a flaky network degrades to
+  the old behaviour instead of stripping every image.
 
 ## Running it locally
 

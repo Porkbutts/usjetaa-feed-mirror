@@ -9,13 +9,19 @@ way to rewrite a placeholder.
 This rebuilds the feed with:
   - image paths corrected (/widget/resources/ -> /resources/)
   - the base64 spacer GIFs Wild Apricot injects stripped out
-  - an <enclosure> carrying the first real image, so consumers get a clean
-    image field instead of having to dig one out of description HTML
+  - an <enclosure> carrying the first image that actually resolves, so
+    consumers get a clean image field instead of having to dig one out of
+    description HTML
+
+Articles sometimes lead with a stale graphic that 404s (a leftover from
+another chapter's event, say) and carry the real one second, so candidates
+are checked rather than assumed.
 """
 
 import html
 import re
 import sys
+import urllib.error
 import urllib.request
 
 FEED = "https://usjetaa.wildapricot.org/widget/Events/RSS"
@@ -49,6 +55,43 @@ def fetch(url: str) -> str:
         return response.read().decode("utf-8")
 
 
+_resolves_cache: dict[str, bool | None] = {}
+
+
+def resolves(url: str) -> bool | None:
+    """True if the URL serves an image, False if not, None if undetermined.
+
+    None matters: if Wild Apricot is unreachable mid-build we must not
+    silently drop every image, so an undetermined candidate is still usable.
+    """
+    if url in _resolves_cache:
+        return _resolves_cache[url]
+
+    request = urllib.request.Request(url, method="HEAD", headers={"User-Agent": UA})
+    try:
+        with urllib.request.urlopen(request, timeout=15) as response:
+            ok = response.headers.get("Content-Type", "").startswith("image/")
+    except urllib.error.HTTPError:
+        ok = False
+    except Exception:
+        ok = None
+
+    _resolves_cache[url] = ok
+    return ok
+
+
+def pick_image(candidates: list[str]) -> str | None:
+    """First candidate that resolves; else first undetermined; else none."""
+    checked = [(url, resolves(url)) for url in candidates]
+    for url, ok in checked:
+        if ok is True:
+            return url
+    for url, ok in checked:
+        if ok is None:
+            return url
+    return None
+
+
 def mime_for(url: str) -> str:
     ext = url.rsplit(".", 1)[-1].split("?")[0].lower()
     return MIMES.get(ext, "image/png")
@@ -69,10 +112,11 @@ def rewrite_item(item: str) -> str:
         + item[match.end(2) :]
     )
 
-    if images:
+    chosen = pick_image(images)
+    if chosen:
         enclosure = (
-            f'<enclosure url="{html.escape(images[0], quote=True)}"'
-            f' length="0" type="{mime_for(images[0])}"/>'
+            f'<enclosure url="{html.escape(chosen, quote=True)}"'
+            f' length="0" type="{mime_for(chosen)}"/>'
         )
         rebuilt = rebuilt.replace("</item>", enclosure + "</item>", 1)
 
