@@ -55,6 +55,23 @@ orphaned emphasis markers 4 to **0**, blank-line runs 79 to **67**, and **no
 words lost** (verified by diffing the word sequence of every article against
 upstream).
 
+## How it is triggered
+
+Two independent sources, so neither is a single point of failure:
+
+- **`schedule`** — nominally hourly, but GitHub drops most scheduled fires on
+  this repo. Measured cadence was ~6h whether the cron said `*/30` or hourly,
+  so tuning the expression does nothing.
+- **`push` to `main`** — a daily cloud routine commits a `.keepalive`
+  timestamp, which fires this workflow. That push also resets the 60-day timer
+  after which GitHub auto-disables scheduled workflows in public repos.
+
+The job pushes with `GITHUB_TOKEN`, and GitHub does not fire workflows for
+pushes made with that token, so the `push` trigger cannot loop. Switching the
+job to a PAT would break that guarantee.
+
+A stale timestamp in `.keepalive` means the routine itself has stopped.
+
 ## Notes
 
 - **The `sk=` token is not needed.** Wild Apricot appends one to feed URLs it

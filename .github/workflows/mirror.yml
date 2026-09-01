@@ -3,6 +3,15 @@ name: Mirror USJETAA feed
 on:
   schedule:
     - cron: "41 * * * *"
+  # Second, independent trigger. GitHub drops most scheduled fires on this repo
+  # (observed ~6h between runs regardless of the cron), so the daily keepalive
+  # routine's push to main doubles as a reliable rebuild.
+  #
+  # This cannot loop: the job pushes with GITHUB_TOKEN, and GitHub does not fire
+  # workflows for pushes made with that token. Switching the job to a PAT would
+  # break that guarantee.
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
