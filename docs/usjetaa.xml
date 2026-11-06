@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
   <channel>
-    <atom:link href="http://usjetaa.wildapricot.org/page-18117/EventModule/5745978/RSS" rel="self" type="application/rss+xml" />
+    <atom:link href="http://usjetaa.wildapricot.org/page-18117/EventModule/5745978/RSS?sk=FOhfdDj%20zT1YZgUWNiXs72PMfPBmeuI4h66DXmx7fWC9/4xwp7mNR927JsfR2NUF" rel="self" type="application/rss+xml" />
     <title>USJETAA upcoming events</title>
     <link>https://usjetaa.wildapricot.org/widget/Events</link>
     <description>USJETAA upcoming events</description>
     <dc:creator>USJETAA</dc:creator>
     <generator>Wild Apricot - membership management software and more</generator>
     <language>en</language>
-    <pubDate>Fri, 06 Nov 2026 18:22:32 GMT</pubDate>
-    <lastBuildDate>Fri, 06 Nov 2026 18:22:32 GMT</lastBuildDate>
+    <pubDate>Fri, 06 Nov 2026 19:02:46 GMT</pubDate>
+    <lastBuildDate>Fri, 06 Nov 2026 19:02:46 GMT</lastBuildDate>
     <item>
       <pubDate>Wed, 15 Apr 2026 21:00:00 GMT</pubDate>
       <title>Nihongo Network Discord Registration (April 15, 2026)</title>
@@ -204,5 +204,24 @@
       <guid>https://usjetaa.wildapricot.org/widget/event-6814403</guid>
       <dc:creator />
     <enclosure url="https://usjetaa.wildapricot.org/resources/Pictures/2026%20Q4-%20Emily%20Frank%20BLOG.png" length="0" type="image/png"/></item>
+    <item>
+      <pubDate>Sat, 30 Jan 2027 18:00:00 GMT</pubDate>
+      <title>Career Compass (JETAA Great Lakes) (January 30, 2027)</title>
+      <description>&lt;p align="center" style="font-family: Georgia, &amp;quot;Times New Roman&amp;quot;, Times, serif;"&gt;&lt;strong style="font-family: Arial, Helvetica, sans-serif;"&gt;Career Compass: Navigating Towards Japan&lt;/strong&gt;&lt;/p&gt;
+&lt;div style="margin-left: 2em"&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;font face="Arial, Helvetica, sans-serif" style="font-size: 14px;"&gt;&lt;font&gt;12:45pm Doors Open | 1pm Event Start&lt;/font&gt;&lt;/font&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;font face="Arial, Helvetica, sans-serif" style="font-size: 14px;"&gt;Industry &amp; Market Update&lt;/font&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;font face="Arial, Helvetica, sans-serif" style="font-size: 14px;"&gt;&lt;font&gt;Career Compass Workshop&lt;/font&gt;&lt;/font&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;font face="Arial, Helvetica, sans-serif" style="font-size: 14px;"&gt;Panel Discussion&lt;/font&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;font face="Arial, Helvetica, sans-serif" style="font-size: 14px;"&gt;Networking Practice (light food &amp; beverages provided)&lt;/font&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;font face="Arial, Helvetica, sans-serif" style="font-size: 14px;"&gt;5pm: Event Concludes&lt;/font&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+&lt;p style="font-family: Georgia, &amp;quot;Times New Roman&amp;quot;, Times, serif;"&gt;&lt;font face="Arial, Helvetica, sans-serif" style="font-size: 14px;"&gt;&lt;strong&gt;&lt;em&gt;Space is limited&lt;/em&gt;&lt;/strong&gt;, so we encourage you to register in order to secure your spot! We look forward to welcoming you and supporting this opportunity to consider Japan-facing career pathways and expand your local network and get prepared for the Job Fair in February!&lt;/font&gt;&lt;/p&gt;</description>
+      <link>https://usjetaa.wildapricot.org/widget/event-6886225</link>
+      <guid>https://usjetaa.wildapricot.org/widget/event-6886225</guid>
+      <dc:creator />
+    <enclosure url="https://usjetaa.wildapricot.org/resources/Pictures/1.30.2027%20Career%20Compass%20Promo-%20BLOG.png" length="0" type="image/png"/></item>
   </channel>
 </rss>
